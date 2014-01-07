@@ -29,7 +29,7 @@ public class Main extends StateBasedGame{
 	public static void main(String args[])
             throws SlickException
     {
-         AppGameContainer app = new AppGameContainer(new Main("Pew Pew - 0.0.1 Alpha"));
+         AppGameContainer app = new AppGameContainer(new Main("Pew Pew - 0.0.2 Alpha"));
          app.setDisplayMode(windowWidth, windowHeight, false);
          app.start();
     }
