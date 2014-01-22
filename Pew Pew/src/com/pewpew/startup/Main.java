@@ -43,6 +43,9 @@ public class Main extends StateBasedGame{
 	public static void main(String args[])
             throws SlickException
     {
+		if(!folder.exists()){
+			folder.mkdir();
+		}
 		filesInFolder = folder.listFiles();
         AppGameContainer app = new AppGameContainer(new Main("Pew Pew - 0.0.3 Alpha"));
         app.setDisplayMode(windowWidth, windowHeight, false);
