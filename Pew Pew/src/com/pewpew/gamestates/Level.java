@@ -47,7 +47,7 @@ public class Level extends BasicGameState{
 	@Override
 	public void init(GameContainer arg0, StateBasedGame arg1)
 			throws SlickException {
-		levelSong = new Music("src/LevelMusic1.wav");
+		levelSong = new Music("resources/LevelMusic1.wav");
 	}
 	
 	public void initializeTiles(){
@@ -223,7 +223,7 @@ public class Level extends BasicGameState{
 				System.out.println("Current char is: " + "'" + l + "'");
 				if(l == 'P'){
 					playerDefaultTile = tile;
-					thePlayer = new Entity(id, tile, new Image("com/pewpew/image/RollingBall.png"), false);
+					thePlayer = new Entity(id, tile, new Image("resources/RollingBall.png"), false);
 					thePlayer.defaultWeapon = new Weapon(WeaponType.SWORD);
 					entities.add(thePlayer);
 					System.out.println("Player placed on tile: " + tile);
@@ -232,12 +232,12 @@ public class Level extends BasicGameState{
 				}
 				else if(l == 'B'){
 					getTiles().get(tile).isBlocked = true;
-					getTiles().get(tile).setTileTexture(new Image("/src/com/pewpew/image/Golmers.png"));
+					getTiles().get(tile).setTileTexture(new Image("resources/Golmers.png"));
 					System.out.println("Tile: " + tile + "is blocked");
 					tile++;
 				}
 				else if(l == 'E'){
-					entities.add(new Entity(id, tile, new Image("com/pewpew/image/RollingEnemy.png"), true));
+					entities.add(new Entity(id, tile, new Image("resources/RollingEnemy.png"), true));
 					tile++;
 					id++;
 				}

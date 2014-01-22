@@ -20,7 +20,7 @@ import com.pewpew.startup.Main;
 public class Battle extends BasicGameState{
 	long timer = 0;
 	Image drawedFirst;
-	String songPath = "src/Cool_Things.wav";
+	String songPath = "resources/Cool_Things.wav";
 	Level level;
 	Vector2f playerPosition;
 	Vector2f opponentPosition;
@@ -44,11 +44,11 @@ public class Battle extends BasicGameState{
 	@Override
 	public void init(GameContainer arg0, StateBasedGame arg1)
 			throws SlickException{
-		hit = new Sound("src/hit.wav");
+		hit = new Sound("resources/hit.wav");
 		song = new Music(songPath);
 		lastAction[0] = "";
 		lastAction[1] = "";
-		drawedFirst = new Image("/src/com/pewpew/image/RollingBall.png");
+		drawedFirst = new Image("resources/RollingBall.png");
 		playerPosition = new Vector2f((windowWidth / 2) / 2, windowHeight / 2);
 		opponentPosition = new Vector2f(((windowWidth / 2) / 2) * 3, windowHeight / 2);
 	}
