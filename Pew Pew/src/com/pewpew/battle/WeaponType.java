@@ -1,17 +1,17 @@
 package com.pewpew.battle;
 
 public enum WeaponType{
-	SWORD(2, 25);
+	SWORD(2, 0.50);
 	
 	int damage;
-	int missChance;
+	double missChance;
 	
-	WeaponType(int damage, int missChance){
+	WeaponType(int damage, double missChance){
 		this.missChance = missChance;
 		this.damage = damage;
 	}
 	
-	public int getChanceForMiss(){
+	public double getChanceForMiss(){
 		return missChance;
 	}
 	

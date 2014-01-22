@@ -6,7 +6,7 @@ import org.newdawn.slick.geom.Vector2f;
 
 public class Weapon{
 	int damage;
-	int missChance;
+	double missChance;
 	Image weaponTexture;
 	boolean isRendered;
 	
@@ -27,7 +27,7 @@ public class Weapon{
 		return damage;
 	}
 	
-	public int getChanceMiss(){
+	public double getChanceMiss(){
 		return missChance;
 	}
 	
