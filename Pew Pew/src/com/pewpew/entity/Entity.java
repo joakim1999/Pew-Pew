@@ -17,16 +17,18 @@ public class Entity {
 	public Weapon defaultWeapon;
 	int currentTileId;
 	public boolean isAI;
+	public boolean needMoving;
 	float remainingLife = 5;
 	Image image;
 	public Vector2f position;
 	ArrayList<Tile> tiles;
 	
-	public Entity(int id, int tileId, Image spriteImage, boolean isAI){
+	public Entity(int id, int tileId, Image spriteImage, boolean isAI, boolean needMoving){
 		this.id = id;
 		this.currentTileId = tileId;
 		this.image = spriteImage;
 		this.isAI = isAI;
+		this.needMoving = needMoving;
 		this.defaultTileId = tileId;
 		this.position = new Vector2f(Level.getTiles().get(tileId).x, Level.getTiles().get(tileId).y);
 	}

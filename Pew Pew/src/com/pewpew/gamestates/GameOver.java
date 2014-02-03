@@ -12,6 +12,7 @@ import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import com.pewpew.components.Button;
+import com.pewpew.other.Action;
 import com.pewpew.startup.Main;
 
 public class GameOver extends BasicGameState{
@@ -21,10 +22,19 @@ public class GameOver extends BasicGameState{
 	Level level;
 
 	@Override
-	public void init(GameContainer arg0, StateBasedGame arg1)
+	public void init(final GameContainer arg0, final StateBasedGame arg1)
 			throws SlickException {
 		 font = new TrueTypeFont(myFont, false);
-		 tryAgain = new Button(0, "Try Again", new Vector2f(Main.windowWidth / 2 - (200 / 2), (Main.windowHeight / 2) + 200 - (50 / 2)), 210, 50);
+		 tryAgain = new Button(0, "Try Again", new Vector2f(Main.windowWidth / 2 - (200 / 2)
+				 , (Main.windowHeight / 2) + 200 - (50 / 2)), 210, 50, new Action(){
+					@Override
+					public void doAction() {
+						arg0.getInput().resume();
+						level.needRestarting = true;
+						arg1.enterState(Main.levelState);
+					}
+			 
+		 });
 	}
 
 	@Override
@@ -39,15 +49,7 @@ public class GameOver extends BasicGameState{
 	public void update(GameContainer arg0, StateBasedGame arg1, int arg2)
 			throws SlickException {
 		Input in = arg0.getInput();
-		int mouseX = in.getMouseX();
-		int mouseY = in.getMouseY();
-		if(in.isMouseButtonDown(0)){
-			if(mouseX >= tryAgain.position.x && mouseX <= tryAgain.position.x + tryAgain.width && mouseY > tryAgain.position.y && mouseY < tryAgain.position.y + tryAgain.height){
-				arg0.getInput().resume();
-				level.needRestarting = true;
-				arg1.enterState(Main.levelState);
-			}
-		}
+		tryAgain.update(arg0, arg1, arg2);
 	}
 
 	@Override

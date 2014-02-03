@@ -48,6 +48,7 @@ public class Main extends StateBasedGame{
 		}
 		filesInFolder = folder.listFiles();
         AppGameContainer app = new AppGameContainer(new Main("Pew Pew - 0.0.3 Alpha"));
+        app.setShowFPS(false);
         app.setDisplayMode(windowWidth, windowHeight, false);
         app.start();
     }

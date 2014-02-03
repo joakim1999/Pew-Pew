@@ -13,6 +13,7 @@ import org.newdawn.slick.state.StateBasedGame;
 import org.newdawn.slick.Color;
 
 import com.pewpew.components.Button;
+import com.pewpew.other.Action;
 import com.pewpew.startup.Main;
 
 public class Menu extends BasicGameState{
@@ -24,16 +25,32 @@ public class Menu extends BasicGameState{
 	JFrame frame;
 
 	@Override
-	public void init(GameContainer arg0, StateBasedGame arg1)
+	public void init(final GameContainer arg0, final StateBasedGame arg1)
 			throws SlickException {
 		frame = new JFrame();
 		buttonWidth = 250;
 		buttonHeight = 50;
-		startButton = new Button(0, "Start Game", new Vector2f(320 - (buttonWidth/2), 200), buttonWidth, buttonHeight);
+		startButton = new Button(0, "Start Game", new Vector2f(320 - (buttonWidth/2), 200), buttonWidth, buttonHeight, new Action(){
+			@Override
+			public void doAction() {
+				arg0.getInput().resume();
+				arg1.enterState(Main.levelState);
+			}
+		});
 		buttonWidth = 135;
-		aboutButton = new Button(0, "About", new Vector2f(320 - (buttonWidth/2), 300), buttonWidth, buttonHeight);
+		aboutButton = new Button(0, "About", new Vector2f(320 - (buttonWidth/2), 300), buttonWidth, buttonHeight, new Action(){
+			@Override
+			public void doAction() {
+				JOptionPane.showMessageDialog(frame, "PewPew is a science fiction role-playing game");
+			}
+		});
 		buttonWidth = 90;
-		exitButton = new Button(0, "Exit", new Vector2f(320 - (buttonWidth/2), 400), buttonWidth, buttonHeight);
+		exitButton = new Button(0, "Exit", new Vector2f(320 - (buttonWidth/2), 400), buttonWidth, buttonHeight, new Action(){
+			@Override
+			public void doAction() {
+				System.exit(0);
+			}
+		});
 	}
 
 	@Override
@@ -45,27 +62,11 @@ public class Menu extends BasicGameState{
 	}
 
 	@Override
-	public void update(GameContainer arg0, StateBasedGame arg1, int arg2)
+	public void update(GameContainer gc, StateBasedGame sbg, int delta)
 			throws SlickException {
-		Input in = arg0.getInput();
-		int mouseX = in.getMouseX();
-		int mouseY = in.getMouseY();
-		if(in.isMouseButtonDown(0)){
-			if(mouseX >= startButton.position.x && mouseX <= startButton.position.x + startButton.width && mouseY > startButton.position.y && mouseY < startButton.position.y + startButton.height){
-				arg0.getInput().resume();
-				arg1.enterState(Main.levelState);
-			}
-		}
-		if(in.isMouseButtonDown(0)){
-			if(mouseX >= aboutButton.position.x && mouseX <= aboutButton.position.x + startButton.width && mouseY > aboutButton.position.y && mouseY < aboutButton.position.y + aboutButton.height){
-				JOptionPane.showMessageDialog(frame, "PewPew is a science fiction role-playing game");
-			}
-		}
-		if(in.isMouseButtonDown(0)){
-			if(mouseX >= exitButton.position.x && mouseX <= exitButton.position.x + exitButton.width && mouseY > exitButton.position.y && mouseY < exitButton.position.y + exitButton.height){
-				System.exit(0);
-			}
-		}
+		startButton.update(gc, sbg, delta);
+		aboutButton.update(gc, sbg, delta);
+		exitButton.update(gc, sbg, delta);
 	}
 
 	@Override
