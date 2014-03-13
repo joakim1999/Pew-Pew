@@ -1,7 +1,9 @@
 package com.pewpew.battle;
 
 public enum WeaponType{
-	SWORD(2, 0.50);
+	WOODSWORD(2, 0.50),
+	IRONSWORD(3, 0.50),
+	DIAMONDSWORD(5, 0.50);
 	
 	int damage;
 	double missChance;

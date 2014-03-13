@@ -16,38 +16,45 @@ import org.newdawn.slick.state.StateBasedGame;
 
 import com.pewpew.components.Button;
 import com.pewpew.components.Dialogue;
+import com.pewpew.components.EnergyBar;
 import com.pewpew.components.HealthBar;
+import com.pewpew.entity.EnemyType;
 import com.pewpew.entity.Entity;
 import com.pewpew.gamestates.Level;
+import com.pewpew.inventory.Inventory;
+import com.pewpew.inventory.Item;
+import com.pewpew.inventory.ItemPool;
+import com.pewpew.inventory.Loot;
 import com.pewpew.other.Action;
 import com.pewpew.startup.Main;
 
 public class Battle extends BasicGameState{
-	long timer = 0;
 	Image drawedFirst;
 	String songPath = "resources/Cool_Things.wav";
 	ArrayList<Button> buttons;
 	Level level;
-	int componentIdCounter = 0;
+	Inventory playerInventory;
 	Vector2f playerPosition;
 	Vector2f opponentPosition;
 	Random rand = new Random();
 	String lastAction = "";
-	int windowWidth;
-	int windowHeight;
-	int GUIAreaHeight = (Main.windowHeight / 7);
-	int GUIAreaWidth = Main.windowWidth - 1;
-	Vector2f GUIAreaPosition;
-	boolean isCinematicPlaying = false;
-	int turn = 0;
 	Sound hit;
 	Music song;
 	Dialogue dialogue;
 	HealthBar hbarPlayer;
-	HealthBar hbarOpponent;
-	public boolean isStillInBattle = true;
+	EnergyBar ebarPlayer;
+	Vector2f GUIAreaPosition;
+	long timer = 0;
+	int componentIdCounter = 0;
+	int windowWidth;
+	int windowHeight;
+	int GUIAreaHeight = (Main.windowHeight / 7);
+	int GUIAreaWidth = Main.windowWidth - 1;
+	int turn = 0;
+	boolean isCinematicPlaying = false;
 	private Entity player;
 	private Entity opponent;
+	public boolean isStillInBattle = true;
 	
 	public Battle(int windowWidth, int windowHeight){
 		this.windowWidth = windowWidth;
@@ -58,21 +65,33 @@ public class Battle extends BasicGameState{
 	public void init(GameContainer arg0, StateBasedGame arg1)
 			throws SlickException{
 		GUIAreaPosition = new Vector2f(0, windowHeight - GUIAreaHeight);
-		hit = new Sound("resources/hit.wav");
-		song = new Music(songPath);
 		buttons = new ArrayList<Button>();
 		lastAction = "";
 		drawedFirst = new Image("resources/RollingBall.png");
+		
+		setUpResources();
+		setUpComponents();
+		setUpButtons(arg0, arg1);
+		setButtonFonts(new Font("Verdana", Font.BOLD, 15));
+	}
+	
+	public void setUpEntityPositions(){
 		playerPosition = new Vector2f((windowWidth / 2) / 2, windowHeight / 2);
 		opponentPosition = new Vector2f(((windowWidth / 2) / 2) * 3, windowHeight / 2);
-		hbarPlayer = new HealthBar(componentIdCounter, new Vector2f(0, 0), 20);
+	}
+	
+	public void setUpComponents(){
+		hbarPlayer = new HealthBar(componentIdCounter, new Vector2f(0, 0), 32);
 		componentIdCounter++;
-		hbarOpponent = new HealthBar(componentIdCounter, new Vector2f(Main.windowWidth - 100, GUIAreaPosition.y - 20), 20);
+		ebarPlayer = new EnergyBar(componentIdCounter, new Vector2f(Main.windowWidth - 132, 0), 32);
 		componentIdCounter++;
 		dialogue = new Dialogue(componentIdCounter, lastAction, new Vector2f(GUIAreaPosition.x, GUIAreaPosition.y), GUIAreaWidth, GUIAreaHeight / 2 - 25);
 		componentIdCounter++;
-		setUpButtons(arg0, arg1);
-		setButtonFonts(new Font("Verdana", Font.BOLD, 15));
+	}
+	
+	public void setUpResources() throws SlickException{
+		hit = new Sound("resources/hit.wav");
+		song = new Music(songPath);
 	}
 
 	@Override
@@ -89,10 +108,12 @@ public class Battle extends BasicGameState{
 		
 		dialogue.render(gc, sb, g);
 		hbarPlayer.render(gc, sb, g);
-		hbarOpponent.render(gc, sb, g);
+		ebarPlayer.render(gc, sb, g);
 		
 		renderGUIArea(g);
 		renderButtons(g);
+		
+		playerInventory.render(gc, sb, g);
 	}
 	
 	public void setButtonFonts(Font f){
@@ -130,8 +151,9 @@ public class Battle extends BasicGameState{
 	@Override
 	public void update(GameContainer gc, StateBasedGame sbg, int delta)
 			throws SlickException {
+		playerInventory.update(gc, sbg, delta);
 		hbarPlayer.setHealthRemaining(player.getRemainingLife());
-		hbarOpponent.setHealthRemaining(opponent.getRemainingLife());
+		ebarPlayer.setEnergyRemaining(player.getRemainingEnergy());
 		dialogue.setDialogueText(lastAction);
 		player.position = playerPosition;
 		opponent.position = opponentPosition;
@@ -153,7 +175,6 @@ public class Battle extends BasicGameState{
 			opponentPosition = new Vector2f(((windowWidth / 2) / 2) * 3, windowHeight / 2);
 			for(Button b : buttons){
 				b.update(gc, sbg, delta);
-				System.out.println(b.id + " is updated");
 			}
 			doRound(gc, sbg, delta);
 		}
@@ -177,8 +198,16 @@ public class Battle extends BasicGameState{
 			boolean didMiss = !(d <= 0.75);
 			if(didMiss == false){
 				hit.play();
-				player.giveDamageTo(opponent, player.defaultWeapon.damage);
-				lastAction = "You hit the enemy. The enemy losed " + player.defaultWeapon.damage + " hitpoints";
+				int damage;
+				if(player.defaultWeapon != null){
+					damage = player.defaultWeapon.damage + level.playerLevel;
+					player.giveDamageTo(opponent, player.defaultWeapon.damage + level.playerLevel);
+				}
+				else{
+					damage = 1 + level.playerLevel;
+					player.giveDamageTo(opponent, 1 + level.playerLevel);
+				}
+				lastAction = "You hit the enemy. The enemy lost " + damage + " hitpoints";
 				turn++;
 			}
 			else{
@@ -188,18 +217,28 @@ public class Battle extends BasicGameState{
 		}
 		if(opponent.getRemainingLife() <= 0){
 			isCinematicPlaying = false;
-			level.entities.remove(opponent);
-			level.destroy(opponent);
-			if(player.getRemainingLife() <= 3){
-				player.restore(2);
-			}
-			else if(player.getRemainingLife() == 4){
-				player.restore(1);
-			}
 			turn = 0;
 			lastAction = "";
 			lastAction = "";
 			gc.getInput().resume();
+			ArrayList<ItemPool> matchingItemPools = new ArrayList<ItemPool>();
+			for(ItemPool ip : level.itemPools){
+				int itemCounter = 0;
+				for(Item i : ip.items){
+					if(i != null){
+						itemCounter++;
+					}
+				}
+				System.out.println(EnemyType.EASY.getMaxNumberOfLootItems());
+				if(itemCounter <= opponent.eType.getMaxNumberOfLootItems()){
+					matchingItemPools.add(ip);
+				}
+			}
+			Random rand = new Random();
+			System.out.println(matchingItemPools.size());
+			level.loot = new Loot(level.thePlayer, matchingItemPools.get(rand.nextInt(matchingItemPools.size())), playerInventory);
+			level.loot.isOpened = true;
+			level.destroy(opponent);
 			song.stop();
 			sbg.enterState(0);
 		}
@@ -217,7 +256,7 @@ public class Battle extends BasicGameState{
 			hit.play();
 			float damage = rand.nextInt(3);
 			opponent.giveDamageTo(player, damage);
-			lastAction = "The enemy hit you. You losed " + damage + " hitpoints";
+			lastAction = "The enemy hit you. You lost " + damage + " hitpoints";
 			if(player.getRemainingLife() <= 0){
 				isCinematicPlaying = false;
 				opponent.restore();
@@ -241,6 +280,10 @@ public class Battle extends BasicGameState{
 		this.player = player;
 		this.opponent = opponent;
 		drawedFirst = player.getSpriteImage();
+	}
+	
+	public void setInventory(Inventory i){
+		this.playerInventory = i;
 	}
 
 	@Override

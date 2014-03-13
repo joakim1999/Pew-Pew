@@ -2,6 +2,7 @@ package com.pewpew.components;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Vector2f;
 import org.newdawn.slick.state.StateBasedGame;
 
@@ -18,7 +19,7 @@ public abstract class Component {
 		this.height = height;
 	}
 	
-	public abstract void render(GameContainer gc, StateBasedGame sbg, Graphics gr);
+	public abstract void render(GameContainer gc, StateBasedGame sbg, Graphics gr) throws SlickException;
 	
-	public abstract void update(GameContainer gc, StateBasedGame sbg, int delta);
+	public abstract void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException;
 }

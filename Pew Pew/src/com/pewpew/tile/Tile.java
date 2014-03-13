@@ -10,6 +10,7 @@ public class Tile {
 	public int id;
 	public Image texture;
 	public boolean isBlocked = false;
+	public boolean isOccupied;
 	
 	public Tile(int x, int y, int width, int height, int id){
 		this.id = id;
